@@ -11,7 +11,7 @@ public class Server {
     ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
     public void startingTheServer(int port) {
-        try (final var serverSocket = new ServerSocket(9999)) {
+        try (final var serverSocket = new ServerSocket(port)) {
             while (true) {
                 final var socket = serverSocket.accept();
                 System.out.println(socket);
