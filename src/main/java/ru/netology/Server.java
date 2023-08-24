@@ -7,10 +7,11 @@ import java.util.concurrent.Executors;
 
 
 public class Server {
+
     final int NUMBER_OF_THREADS = 64;
     ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
-    public void startingTheServer(int port) {
+    public void startHTTPServer(int port) {
         try (final var serverSocket = new ServerSocket(port)) {
             while (true) {
                 final var socket = serverSocket.accept();
