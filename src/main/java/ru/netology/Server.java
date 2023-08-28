@@ -1,26 +1,44 @@
 package ru.netology;
 
+import ru.netology.ClientHandler;
+import ru.netology.Handler;
+
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
 public class Server {
-
-    final int NUMBER_OF_THREADS = 64;
-    ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+    final int COUNT = 64;
+    ExecutorService executorService = Executors.newFixedThreadPool(COUNT);
+    private final static Map<String, Map<String, Handler>> handlers = new ConcurrentHashMap<>();
 
     public void startHTTPServer(int port) {
-        try (final var serverSocket = new ServerSocket(port)) {
+
+        try (final ServerSocket serverSocket = new ServerSocket(9999)) {
             while (true) {
-                final var socket = serverSocket.accept();
+                final Socket socket = serverSocket.accept();
                 System.out.println(socket);
-                Handler handler = new Handler(socket);
-                executorService.submit(handler);
+                ClientHandler clientHandler = new ClientHandler(socket);
+                executorService.submit(clientHandler);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void addHandler(String method, String path, Handler handler) {
+        if (handlers.containsKey(method)) {
+            handlers.get(method).put(path, handler);
+        } else {
+            handlers.put(method, new ConcurrentHashMap<>(Map.of(path, handler)));
+        }
+    }
+
+    public static Map<String, Map<String, Handler>> getHandlers() {
+        return handlers;
     }
 }
